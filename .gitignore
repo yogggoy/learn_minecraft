@@ -2,4 +2,7 @@
 /cmake-build-debug/
 /cmake-build-release/
 /engine_log.txt
-/engine/
+#/engine/
+/.vs
+/out
+learn_minecraft.*

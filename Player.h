@@ -23,6 +23,7 @@ public:
     void previousBlock();
 
     void collisionCallBack(const CollisionInfo& info) override;
+    //void collisionCallBack(const CollisionPoint& info) override;
 };
 
 

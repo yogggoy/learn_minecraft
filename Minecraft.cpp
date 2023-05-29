@@ -1,6 +1,10 @@
 //
 // Created by Иван Ильин on 03.10.2021.
 //
+#ifndef _USE_MATH_DEFINES // for C++
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
+#endif
 
 #include "Minecraft.h"
 #include "engine/utils/ResourceManager.h"
@@ -14,7 +18,7 @@ void Minecraft::start() {
     setGlEnable(true);
 
     // loading map
-    // TODO: implement (lesson 1)
+    map->loadMap(MinecraftConsts::MAP_NAME);
 
     // setting callbacks for playerController
     playerController->setAddCubeCallBack([this](){ addCube(); });
@@ -23,10 +27,19 @@ void Minecraft::start() {
     world->addBody(player);
 
     // orientating and attaching camera
-    // TODO: implement (lesson 2)
+    camera->translateToPoint(player->position() + Vec3D(0, 2.8, 0));
+    player->attach(camera);
+
+    player->translate(Vec3D(0, 16, 0));
 
     // adding cube in hand
-    // TODO: implement (lesson 2)
+    auto cube_in_hand = world->addBody(std::make_shared<RigidBody>(Mesh::Cube(ObjectNameTag("cube_in_hand"), 3)));
+    cube_in_hand->setCollider(false);
+    cube_in_hand->translateToPoint(player->position() + Vec3D{-3, -1, 1.4});
+    cube_in_hand->rotate(Vec3D(0, M_PI / 10, 0));
+    camera->attach(cube_in_hand);
+    updateCubeInHandColor();
+    world->addBody(player);
 }
 
 void Minecraft::update() {
@@ -53,13 +66,22 @@ void Minecraft::update() {
     }
 
     playerController->update();
+    //cameraController.update();
 }
 
 void Minecraft::updateCubeInHandColor() {
-    // TODO: implement (lesson 2)
+    world->body(ObjectNameTag("cube_in_hand"))->setColor(Cube::cubeColor(player->selectedBlock()));
 }
 
 void Minecraft::gui() {
+    auto t = ResourceManager::loadTexture(MinecraftConsts::AIM_TEXTURE);
+    if (t != nullptr) {
+        sf::Sprite sprite;
+        sprite.setTexture(*t);
+        sprite.setPosition(screen->width() / 2 - 27, screen->height() / 2 - 27);
+        sprite.setColor(sf::Color(0, 0, 0, 150));
+        screen->drawSprite(sprite);
+    }
     // TODO: implement (lesson 2)
 }
 

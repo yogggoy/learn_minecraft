@@ -1,7 +1,10 @@
 //
 // Created by Иван Ильин on 19.09.2021.
 //
-
+#ifndef _USE_MATH_DEFINES // for C++
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
+#endif
 #include "PlayerController.h"
 #include "engine/utils/Log.h"
 #include "engine/animation/Animations.h"
@@ -16,22 +19,52 @@ void PlayerController::update() {
     auto camera = _player->attached(ObjectNameTag("Camera"));
 
     // Left and right movement
-    // TODO: implement (lesson 2)
+    if (Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        _player->translate(_player->left() * Time::deltaTime() * MinecraftConsts::WALK_SPEED);
+    }
+    if (Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        _player->translate(-_player->left() * Time::deltaTime() * MinecraftConsts::WALK_SPEED);
+    }
 
     // Forward and backward movement
-    // TODO: implement (lesson 2)
+    if (Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        _player->translate(_player->lookAt() * Time::deltaTime() * MinecraftConsts::WALK_SPEED);
+    }
+    if (Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        _player->translate(-_player->lookAt() * Time::deltaTime() * MinecraftConsts::WALK_SPEED);
+    }
 
     // Jump
-    // TODO: implement (lesson 2)
+    if (Keyboard::isKeyPressed(sf::Keyboard::Space) && _player->inCollision()) {
+        _player->setVelocity(Vec3D(0, sqrt(2 * MinecraftConsts::GRAVITY * MinecraftConsts::JUMP_HEIGHT), 0));
+    }
 
     // Horizontal player rotation
-    // TODO: implement (lesson 2)
+    Vec2D disp = _mouse->getMouseDisplacement();
+    _player->rotate(Vec3D(0, -disp.x() * MinecraftConsts::MOUSE_SENSITIVITY, 0));
+
 
     // Vertical player rotation
-    // TODO: implement (lesson 2)
+    double rotationLeft = disp.y() * MinecraftConsts::MOUSE_SENSITIVITY;
+    double headAngle = camera->angleLeftUpLookAt().x();
+    if (headAngle + rotationLeft > M_PI / 2) {
+        rotationLeft = M_PI / 2 - headAngle;
+    }
+    if (headAngle + rotationLeft < -M_PI / 2) {
+        rotationLeft = -M_PI / 2 - headAngle;
+    }
+
+    camera->rotateLeft(rotationLeft);
 
     // Change selected block
-    // TODO: implement (lesson 2)
+    if (_keyboard->isKeyTapped(sf::Keyboard::Right)) {
+        _player->nextBlock();
+        _updateCubeInHandCallBack();
+    }
+    if (_keyboard->isKeyTapped(sf::Keyboard::Left)) {
+        _player->previousBlock();
+        _updateCubeInHandCallBack();
+    }
 
     // Add or remove block
     // TODO: implement (lesson 3)
